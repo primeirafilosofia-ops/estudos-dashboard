@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Painel de Formação Continuada — Carlos Renato</title>
+    <style>
+    :root{
+      --bg:#0f1117; --bg2:#161a24; --card:#1b2030; --card2:#212739;
+      --line:#2b3348; --txt:#e6e9f2; --dim:#9aa4bd; --dim2:#6b7694;
+      --tjsp:#d9660a; --tjsp-b:#f59e0b;
+      --rfb:#8b5cf6; --cgu:#22a06b; --tcu:#3b82f6; --pos:#06b6d4;
+      --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+      --r:14px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--txt);font:15px/1.55 -apple-system,"Segoe UI",Roboto,Inter,sans-serif;padding:22px 18px 60px}
+    .wrap{max-width:1240px;margin:0 auto}
+    header{margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+    h1{font-size:26px;letter-spacing:-.5px;font-weight:700}
+    h1 span{color:var(--tjsp-b)}
+    .sub{color:var(--dim);font-size:14px;margin-top:5px}
+    .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 22px}
+    .tab{background:var(--card);border:1px solid var(--line);color:var(--dim);padding:9px 17px;border-radius:99px;cursor:pointer;font-size:14px;font-weight:600;transition:.15s}
+    .tab:hover{border-color:var(--dim2);color:var(--txt)}
+    .tab.on{background:var(--tjsp);border-color:var(--tjsp);color:#fff}
+    .pane{display:none;animation:f .25s ease}
+    .pane.on{display:block}
+    @keyframes f{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+    .grid{display:grid;gap:16px}
+    .g3{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+    .g2{grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+    .card h2{font-size:15px;font-weight:700;margin-bottom:13px;display:flex;align-items:center;gap:8px}
+    .card h2::before{content:"";width:3px;height:15px;border-radius:2px;background:var(--tjsp)}
+    .card h3{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--dim2);margin:15px 0 9px;font-weight:700}
+    .kpi{font-size:34px;font-weight:800;letter-spacing:-1.5px;line-height:1.05}
+    .kpi.sm{font-size:23px}
+    .kl{font-size:12px;color:var(--dim2);text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-top:6px}
+    .bar{height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;margin-top:11px}
+    .bar i{display:block;height:100%;border-radius:99px;transition:width .5s ease}
+    .tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+    .tbl th{text-align:left;color:var(--dim2);font-size:11px;text-transform:uppercase;letter-spacing:.7px;padding:8px 9px;border-bottom:1px solid var(--line);font-weight:700}
+    .tbl td{padding:9px;border-bottom:1px solid rgba(43,51,72,.55)}
+    .tbl tr:last-child td{border-bottom:none}
+    .tbl tr:hover td{background:rgba(255,255,255,.02)}
+    .num{text-align:right;font-variant-numeric:tabular-nums}
+    .pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.3px}
+    .p-ok{background:rgba(34,197,94,.15);color:#4ade80}
+    .p-w{background:rgba(245,158,11,.15);color:#fbbf24}
+    .p-b{background:rgba(239,68,68,.15);color:#f87171}
+    .p-n{background:rgba(154,164,189,.13);color:var(--dim)}
+    .p-t{background:rgba(217,102,10,.16);color:var(--tjsp-b)}
+    button.b{background:var(--card2);border:1px solid var(--line);color:var(--txt);padding:8px 15px;border-radius:9px;cursor:pointer;font-size:13.5px;font-weight:600;transition:.15s}
+    button.b:hover{border-color:var(--dim2)}
+    button.b.pri{background:var(--tjsp);border-color:var(--tjsp);color:#fff}
+    button.b.pri:hover{filter:brightness(1.12)}
+    button.b.dg:hover{background:rgba(239,68,68,.16);border-color:var(--bad);color:#fca5a5}
+    .row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+    input,select,textarea{background:var(--bg2);border:1px solid var(--line);color:var(--txt);padding:9px 11px;border-radius:9px;font-size:13.5px;font-family:inherit;width:100%}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:var(--tjsp)}
+    label{font-size:11px;color:var(--dim2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;display:block;margin-bottom:5px}
+    .f{flex:1;min-width:130px}
+    .note{font-size:12.5px;color:var(--dim2);line-height:1.6}
+    .bloco{border-left:3px solid var(--tjsp);padding:11px 14px;background:var(--bg2);border-radius:0 9px 9px 0;margin-bottom:9px}
+    .bloco.b2{border-color:var(--rfb)}
+    .bloco.b3{border-color:var(--dim2)}
+    .chip{display:inline-flex;align-items:center;gap:5px;background:var(--card2);border:1px solid var(--line);padding:3px 10px;border-radius:99px;font-size:11.5px;margin:2px 3px 2px 0}
+    .chip i{width:7px;height:7px;border-radius:99px;display:block}
+    .sub-item{font-size:12.5px;color:var(--dim);padding:5px 0 5px 15px;border-left:1px solid var(--line);margin-left:3px}
+    .acc{cursor:pointer;user-select:none}
+    .acc:hover{color:var(--tjsp-b)}
+    .hide{display:none}
+    .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--dim);margin-top:12px}
+    .legend i{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:5px}
+    .empty{text-align:center;color:var(--dim2);padding:30px 12px;font-size:13.5px}
+    .mono{font-family:ui-monospace,"SF Mono",Consolas,monospace;font-size:12.5px}
+    footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);color:var(--dim2);font-size:12.5px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    @media(max-width:640px){body{padding:16px 12px 44px}h1{font-size:21px}.kpi{font-size:28px}}
+    
+    .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+    .gal figure{background:var(--bg2);border:1px solid var(--line);border-radius:11px;overflow:hidden;cursor:pointer;transition:.15s}
+    .gal figure:hover{border-color:var(--tjsp);transform:translateY(-2px)}
+    .gal img{width:100%;height:150px;object-fit:cover;display:block;background:#0b0e14}
+    .gal figcaption{padding:9px 11px;font-size:12.5px;color:var(--dim)}
+    .gal figcaption b{color:var(--txt);display:block;font-size:13px;margin-bottom:2px}
+    .drop{border:2px dashed var(--line);border-radius:12px;padding:26px;text-align:center;color:var(--dim);cursor:pointer;transition:.15s}
+    .drop:hover,.drop.over{border-color:var(--tjsp);color:var(--txt);background:rgba(217,102,10,.05)}
+    .lb{position:fixed;inset:0;background:rgba(6,8,12,.94);display:none;z-index:99;padding:26px;overflow:auto}
+    .lb.on{display:block}
+    .lb img{max-width:100%;margin:0 auto 14px;display:block;border-radius:10px;border:1px solid var(--line)}
+    .lb .x{position:fixed;top:14px;right:18px;background:var(--card);border:1px solid var(--line);color:#fff;width:40px;height:40px;border-radius:99px;font-size:20px;cursor:pointer}
+    .doc{display:flex;align-items:center;gap:11px;background:var(--bg2);border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-bottom:9px}
+    .doc .ic{width:36px;height:44px;border-radius:5px;background:linear-gradient(160deg,#d9660a,#8a3f06);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex:none}
+    .doc .info{flex:1;min-width:0}
+    .doc .info b{font-size:13.5px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .doc .info span{font-size:12px;color:var(--dim2)}
+    </style>
+    </head>
+    <body>
+    <div class="wrap">
+    <header>
+      <h1>Painel de <span>Formação Continuada</span></h1>
+      <div class="sub">Carlos Renato do Amaral &middot; concursos de controle e judiciário + pós-graduação &middot; um só registro, leitura por horizonte</div>
+    </header>
+    <div class="tabs">
+      <div class="tab on" data-p="p-tjsp">TJ-SP &middot; frente ativa</div>
+      <div class="tab" data-p="p-log">Registro diário</div>
+      <div class="tab" data-p="p-acervo">Acervo visual &amp; PDFs</div>
+  <div class="tab" data-p="p-disc">Disciplinas &amp; temas</div>
+      <div class="tab" data-p="p-lastro">Frentes de lastro</div>
+  <div class="tab" data-p="p-pos">Pós-graduação</div>
+      <div class="tab" data-p="p-dados">Dados</div>
+    </div>
+    <div id="app"></div>
+    <footer>
+      <span>Dados salvos no navegador (localStorage). Exporte o JSON como backup.</span>
+      <span>Atualizado em 13/10/2026</span>
+    </footer>
+    </div>
+    <script>
+    
+    /* ===== CONFIG — semeado, editável na interface ===== */
+    const SEED = {
+      meta:{atualizado:"2026-10-13"},
+      carreiras:[
+        {id:"tjsp",nome:"TJ-SP",cargo:"Escrevente Técnico Judiciário",nio:"Médio",sal:"R$ 6.782,54 + auxílios",banca:"Vunesp",status:"ATIVO — edital iminente",prio:1,horizonte:"curto",cor:"#d9660a",ativo:true,
+         corte:50,
+         blocos:[{n:"I",q:16,car:"Eliminatório",desc:"Língua Portuguesa"},{n:"II",q:30,car:"Núcleo de aprovação",desc:"Direito Penal 6 · Proc. Penal 5 · Proc. Civil 5 · Legislação Interna 6 · Constitucional 4 · Administrativo 4"},{n:"III",q:24,car:"Apenas classificatório",desc:"Informática 9 · RLM 7 · Atualidades 4 · Matemática 4"}]},
+        {id:"rfb",nome:"Receita Federal",cargo:"Auditor-Fiscal da RFB",nio:"Superior",sal:"R$ 21.000,00",banca:"FGV",status:"Edital estimado até mar/2027",prio:2,horizonte:"medio",cor:"#8b5cf6",ativo:false,
+         corte:null,
+         blocos:[{n:"Mód. I",q:80,car:"Básicos",desc:"LP 10 · Fluência em Dados 10 · Inglês 8 · RLM 8 · Adm. Geral 8 · Adm. Pública 8 · Auditoria 8 · Contabilidade 8 · Estatística 6 · Economia 6"},{n:"Mód. II",q:60,car:"Específicos",desc:"Dir. Tributário 12 · Leg. Aduaneira 12 · Previdenciário 10 · Leg. Tributária 10 · Adm. 8 · Const. 8"}]},
+        {id:"cgu",nome:"CGU",cargo:"Auditor Federal de Finanças e Controle",nio:"Superior",sal:"R$ 20.000,00",banca:"Cebraspe",status:"Prova 13/12/2026 — decisão: não concorrer nesta edição",prio:3,horizonte:"longo",cor:"#22a06b",ativo:false,
+         corte:null,
+         blocos:[{n:"Bás.",q:0,car:"170 itens C/E no total",desc:"Estado e democracia · sociedade brasileira · ética pública · administração pública e políticas públicas"},{n:"Compl.",q:0,car:"",desc:"Governança/riscos/integridade · transparência e participação · direito público e controle · EVIDÊNCIAS, DADOS e IA · auditoria governamental"},{n:"Espec.",q:0,car:"",desc:"Por especialidade"}]},
+        {id:"tcu",nome:"TCU",cargo:"Auditor Federal de Controle Externo",nio:"Superior",sal:"R$ 26.159,01",banca:"Cebraspe",status:"Sem edital — PLOA 2027 sinaliza certame",prio:4,horizonte:"longo",cor:"#3b82f6",ativo:false,
+         corte:null,blocos:[{n:"Único",q:200,car:"Projeção do último edital",desc:"AFO · Controle Externo · Auditoria Governamental (peso alto projetado)"}]},
+        {id:"pos",nome:"Pós-graduação",cargo:"MBA Data Science e Analytics",nio:"—",sal:"—",banca:"—",status:"Contínua — painel separado (v2)",prio:5,horizonte:"continua",cor:"#06b6d4",ativo:false,corte:null,blocos:[]}
+      ],
+      /* peso = nº de questões na grade; bloco = a que bloco pertence; mult = multiplicador tático */
+      disciplinas:[
+        {id:"d1",nome:"Língua Portuguesa",cor:"#3b82f6",car:["tjsp","rfb","cgu","tcu"],peso:{tjsp:{q:16,b:"I"},rfb:{q:10,b:"Básicos"}},rend:{ok:0,tt:0},subs:[
+          {id:"s1a",nome:"Classes de Palavras I — Substantivo e Adjetivo",fonte:"PDF aula cap. 1",pag:"1–128",inc:"alta",st:"estudando",subs:["Classificação do substantivo","Flexão de gênero: uniformes, epicenos, sobrecomuns, comuns de 2 gêneros","Substantivação pelo artigo (derivação imprópria)","Plural de compostos: mal-estares, arcos-íris, louva-a-deus","Adjetivo: classificação e pátrios","Adjunto adnominal × predicativo","Inversão Sub.+Adj.: os 9 pares e a regra da troca de classe"]},
+          {id:"s1b",nome:"Classes de Palavras II — Verbos e pronomes",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]},
+          {id:"s1c",nome:"Sintaxe: termos da oração, concordância, regência",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]},
+          {id:"s1d",nome:"Pontuação, crase, acentuação e ortografia",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]},
+          {id:"s1e",nome:"Interpretação e coesão textual",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]}]},
+        {id:"d2",nome:"Direito Penal",cor:"#ef4444",car:["tjsp"],peso:{tjsp:{q:6,b:"II"}},rend:{ok:0,tt:0},subs:[
+          {id:"s2a",nome:"Aplicação da lei penal e crimes contra a pessoa",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]},
+          {id:"s2b",nome:"Crimes contra o patrimônio",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]},
+          {id:"s2c",nome:"Crimes contra a Administração Pública",fonte:"a enviar",pag:"",inc:"media",st:"nao_iniciado",subs:[]}]},
+        {id:"d3",nome:"Direito Processual Penal",cor:"#f97316",car:["tjsp"],peso:{tjsp:{q:5,b:"II"}},rend:{ok:0,tt:0},subs:[
+          {id:"s3a",nome:"Inquérito, ação penal e prisões cautelares",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]},
+          {id:"s3b",nome:"Provas e competência",fonte:"a enviar",pag:"",inc:"media",st:"nao_iniciado",subs:[]}]},
+        {id:"d4",nome:"Direito Processual Civil",cor:"#14b8a6",car:["tjsp"],peso:{tjsp:{q:5,b:"II"}},rend:{ok:0,tt:0},subs:[
+          {id:"s4a",nome:"Princípios, jurisdição e competência",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]},
+          {id:"s4b",nome:"Atos processuais, prazos e citação",fonte:"a enviar",pag:"",inc:"media",st:"nao_iniciado",subs:[]}]},
+        {id:"d5",nome:"Legislação Interna TJ-SP",cor:"#a78bfa",car:["tjsp"],peso:{tjsp:{q:6,b:"II"}},rend:{ok:0,tt:0},subs:[
+          {id:"s5a",nome:"Regimento Interno do TJ-SP",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]},
+          {id:"s5b",nome:"Lei de Organização Judiciária e normas correlatas",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]}]},
+        {id:"d6",nome:"Direito Constitucional",cor:"#8b5cf6",car:["tjsp","rfb","cgu","tcu"],peso:{tjsp:{q:4,b:"II"},rfb:{q:8,b:"Específicos"}},rend:{ok:0,tt:0},subs:[
+          {id:"s6a",nome:"Direitos e garantias fundamentais",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]},
+          {id:"s6b",nome:"Organização do Estado e dos Poderes",fonte:"a enviar",pag:"",inc:"media",st:"nao_iniciado",subs:[]},
+          {id:"s6c",nome:"Controle de constitucionalidade",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]}]},
+        {id:"d7",nome:"Direito Administrativo",cor:"#0ea5e9",car:["tjsp","rfb","cgu","tcu"],peso:{tjsp:{q:4,b:"II"},rfb:{q:8,b:"Específicos"}},rend:{ok:0,tt:0},subs:[
+          {id:"s7a",nome:"Princípios, poderes e atos administrativos",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]},
+          {id:"s7b",nome:"Servidores públicos (Lei 8.112/90) e processo administrativo",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]},
+          {id:"s7c",nome:"Licitações, contratos e improbidade",fonte:"a enviar",pag:"",inc:"media",st:"nao_iniciado",subs:[]}]},
+        {id:"d8",nome:"Raciocínio Lógico Matemático",cor:"#eab308",car:["tjsp","rfb","cgu","tcu"],peso:{tjsp:{q:7,b:"III"},rfb:{q:8,b:"Básicos"}},rend:{ok:0,tt:0},subs:[
+          {id:"s8a",nome:"Proposições, conectivos e equivalências",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]},
+          {id:"s8b",nome:"Conjuntos, análise combinatória e probabilidade",fonte:"a enviar",pag:"",inc:"media",st:"nao_iniciado",subs:[]}]},
+        {id:"d9",nome:"Informática",cor:"#64748b",car:["tjsp"],peso:{tjsp:{q:9,b:"III"}},rend:{ok:0,tt:0},subs:[
+          {id:"s9a",nome:"Sistemas operacionais, editores e planilhas",fonte:"a enviar",pag:"",inc:"media",st:"nao_iniciado",subs:[]},
+          {id:"s9b",nome:"Redes, internet, segurança da informação",fonte:"a enviar",pag:"",inc:"media",st:"nao_iniciado",subs:[]}]},
+        {id:"d10",nome:"Atualidades",cor:"#94a3b8",car:["tjsp"],peso:{tjsp:{q:4,b:"III"}},rend:{ok:0,tt:0},subs:[
+          {id:"s10a",nome:"Fatos recentes — Brasil e mundo",fonte:"a enviar",pag:"",inc:"baixa",st:"nao_iniciado",subs:[]}]},
+        {id:"d11",nome:"Matemática",cor:"#a3a3a3",car:["tjsp"],peso:{tjsp:{q:4,b:"III"}},rend:{ok:0,tt:0},subs:[
+          {id:"s11a",nome:"Aritmética, porcentagem e proporcionalidade",fonte:"a enviar",pag:"",inc:"baixa",st:"nao_iniciado",subs:[]}]},
+        {id:"d12",nome:"Estatística",cor:"#0891b2",car:["rfb","cgu"],peso:{rfb:{q:6,b:"Básicos"}},rend:{ok:0,tt:0},subs:[{id:"s12a",nome:"Descritiva, probabilidade e inferência",fonte:"a enviar",pag:"",inc:"media",st:"nao_iniciado",subs:[]}]},
+        {id:"d13",nome:"Fluência em Dados / Ciência de Dados",cor:"#db2777",car:["rfb","cgu"],peso:{rfb:{q:10,b:"Básicos"}},rend:{ok:0,tt:0},subs:[{id:"s13a",nome:"Analytics, Machine Learning e IA",fonte:"conteúdo do MBA",pag:"",inc:"alta",st:"nao_iniciado",subs:[]},{id:"s13b",nome:"Governança de dados e Big Data",fonte:"a enviar",pag:"",inc:"media",st:"nao_iniciado",subs:[]}]},
+        {id:"d14",nome:"Administração Geral",cor:"#65a30d",car:["rfb","cgu","tcu"],peso:{rfb:{q:8,b:"Básicos"}},rend:{ok:0,tt:0},subs:[{id:"s14a",nome:"Processo administrativo e planejamento estratégico",fonte:"a enviar",pag:"",inc:"media",st:"nao_iniciado",subs:[]}]},
+        {id:"d15",nome:"Administração Pública",cor:"#ca8a04",car:["rfb","cgu","tcu"],peso:{rfb:{q:8,b:"Básicos"}},rend:{ok:0,tt:0},subs:[{id:"s15a",nome:"Modelos de Estado, accountability e controle social",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]}]},
+        {id:"d16",nome:"Auditoria",cor:"#4d7c0f",car:["rfb","cgu","tcu"],peso:{rfb:{q:8,b:"Básicos"}},rend:{ok:0,tt:0},subs:[{id:"s16a",nome:"NBC TA/PA, evidências e procedimentos",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]}]},
+        {id:"d17",nome:"Contabilidade Geral e Pública",cor:"#7e22ce",car:["rfb","cgu","tcu"],peso:{rfb:{q:8,b:"Básicos"}},rend:{ok:0,tt:0},subs:[{id:"s17a",nome:"Escrituração e demonstrações contábeis",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]}]},
+        {id:"d18",nome:"Economia e Finanças Públicas",cor:"#b45309",car:["rfb","cgu","tcu"],peso:{rfb:{q:6,b:"Básicos"}},rend:{ok:0,tt:0},subs:[{id:"s18a",nome:"Microeconomia e política fiscal",fonte:"a enviar",pag:"",inc:"media",st:"nao_iniciado",subs:[]}]},
+        {id:"d19",nome:"Direito Tributário",cor:"#9333ea",car:["rfb","cgu"],peso:{rfb:{q:12,b:"Específicos"}},rend:{ok:0,tt:0},subs:[{id:"s19a",nome:"Obrigação, crédito tributário e lançamento",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]}]},
+        {id:"d20",nome:"Legislação Tributária",cor:"#6d28d9",car:["rfb"],peso:{rfb:{q:10,b:"Específicos"}},rend:{ok:0,tt:0},subs:[{id:"s20a",nome:"IR, IPI, II e IE: fato gerador e base de cálculo",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]}]},
+        {id:"d21",nome:"Legislação Aduaneira",cor:"#5b21b6",car:["rfb"],peso:{rfb:{q:12,b:"Específicos"}},rend:{ok:0,tt:0},subs:[{id:"s21a",nome:"Jurisdição aduaneira e controle de veículos",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]}]},
+        {id:"d22",nome:"Direito Previdenciário",cor:"#0284c7",car:["rfb"],peso:{rfb:{q:10,b:"Específicos"}},rend:{ok:0,tt:0},subs:[{id:"s22a",nome:"RGPS, custeio e benefícios",fonte:"a enviar",pag:"",inc:"media",st:"nao_iniciado",subs:[]}]},
+        {id:"d23",nome:"Língua Inglesa",cor:"#334155",car:["rfb"],peso:{rfb:{q:8,b:"Básicos"}},rend:{ok:0,tt:0},subs:[{id:"s23a",nome:"Compreensão e interpretação de texto",fonte:"a enviar",pag:"",inc:"media",st:"nao_iniciado",subs:[]}]},
+        {id:"d24",nome:"Ética e Integridade Pública",cor:"#10b981",car:["cgu","tcu"],peso:{},rend:{ok:0,tt:0},subs:[{id:"s24a",nome:"Ética pública e responsabilidade profissional",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]}]},
+        {id:"d25",nome:"Governança, Riscos e Controle Interno",cor:"#0d9488",car:["cgu","tcu"],peso:{},rend:{ok:0,tt:0},subs:[{id:"s25a",nome:"Fundamentos de governança, riscos e integridade",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]}]},
+        {id:"d26",nome:"Transparência e Participação Social",cor:"#06b6d4",car:["cgu"],peso:{},rend:{ok:0,tt:0},subs:[{id:"s26a",nome:"Transparência, ouvidoria e participação",fonte:"a enviar",pag:"",inc:"alta",st:"nao_iniciado",subs:[]}]}
+      ],
+      log:[]
+    };
+    
+    /* ===== ESTADO E PERSISTÊNCIA ===== */
+    const KEY = "painel-formacao-cr-v2";
+    let S = load();
+
+    function load(){
+      try{
+        const r = localStorage.getItem(KEY);
+        if(r){ const d = JSON.parse(r); return d; }
+      }catch(e){}
+      return JSON.parse(JSON.stringify(SEED));
+    }
+    function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ alert("Não foi possível salvar no navegador."); } }
+    function reset(){ if(confirm("Restaurar a configuração inicial? O registro diário também será apagado.")){ S = JSON.parse(JSON.stringify(SEED)); save(); render(); } }
+
+    /* ===== HELPERS ===== */
+    const $ = s => document.querySelector(s);
+    const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    const car = id => S.carreiras.find(c=>c.id===id) || {nome:id,cor:"#888"};
+    const disc = id => S.disciplinas.find(d=>d.id===id) || {nome:"—",cor:"#888"};
+    const n1 = v => (Math.round(v*10)/10).toLocaleString("pt-BR");
+
+    /* cobertura: fração dos subtemas concluídos */
+    function cob(d){
+      const f = d.subs || [];
+      if(!f.length) return 0;
+      const ok = f.filter(s=>s.st==="concluido").length;
+      return ok/f.length;
+    }
+    /* horas registradas por disciplina / tema */
+    function horasDe(filtro){
+      return S.log.filter(filtro).reduce((a,l)=>a + (Number(l.horas)||0), 0);
+    }
+    function rendDe(d){
+      let ok=0, tt=0;
+      S.log.filter(l=>l.disciplina===d.id && Number(l.questoes)>0).forEach(l=>{ ok += Number(l.acertos)||0; tt += Number(l.questoes)||0; });
+      return {ok, tt, pct: tt? Math.round(ok/tt*100) : null};
+    }
+
+    /* ===== GRÁFICO SVG (sem dependências) ===== */
+    function donut(pct, cor, label, sub){
+      const r=52, c=2*Math.PI*r, off=c*(1-(pct||0)/100);
+      return `<svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="${esc(label)}">
+        <circle cx="70" cy="70" r="${r}" fill="none" stroke="#212739" stroke-width="15"/>
+        <circle cx="70" cy="70" r="${r}" fill="none" stroke="${cor}" stroke-width="15" stroke-linecap="round"
+          stroke-dasharray="${c}" stroke-dashoffset="${off}" transform="rotate(-90 70 70)"/>
+        <text x="70" y="68" text-anchor="middle" fill="#e6e9f2" font-size="26" font-weight="800">${pct==null?"—":pct+"%"}</text>
+        <text x="70" y="88" text-anchor="middle" fill="#6b7694" font-size="11" font-weight="700">${esc(sub||"")}</text>
+      </svg>`;
+    }
+    function barsH(items, max){
+      const m = max || Math.max(...items.map(i=>i.v), 1);
+      return items.map(i=>`<div style="margin-bottom:11px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px">
+            <span>${esc(i.n)}</span><span class="num" style="color:var(--dim);font-variant-numeric:tabular-nums">${i.lbl}</span>
+          </div>
+          <div class="bar"><i style="width:${(i.v/m*100).toFixed(1)}%;background:${i.c}"></i></div>
+        </div>`).join("");
+    }
+    
+    /* ===== ABA: TJ-SP (FRENTE ATIVA) ===== */
+    function viewTJSP(){
+      const c = car("tjsp");
+      const totalQ = 70, corte = c.corte || 50;
+
+      // disciplinas que pontuam no TJ-SP
+      const doTj = S.disciplinas.filter(d=>d.peso && d.peso.tjsp);
+      const somaQ = doTj.reduce((a,d)=>a+d.peso.tjsp.q,0);
+
+      // horas e rendimento
+      const hTotal = horasDe(l=>l.frente==="concurso");
+      const hTj = horasDe(l=>l.carreira==="tjsp");
+      const questoes = S.log.filter(l=>l.carreira==="tjsp"&&Number(l.questoes)>0);
+      const qT=questoes.reduce((a,l)=>a+(Number(l.questoes)||0),0);
+      const qO=questoes.reduce((a,l)=>a+(Number(l.acertos)||0),0);
+      const pct = qT? Math.round(qO/qT*100):null;
+
+      // cobertura ponderada por bloco (peso do bloco = questões)
+      const blocos = {};
+      doTj.forEach(d=>{ const b=d.peso.tjsp.b; blocos[b]=blocos[b]||{q:0,cob:0}; blocos[b].q+=d.peso.tjsp.q; blocos[b].cob+=cob(d)*d.peso.tjsp.q; });
+      const cobGeral = somaQ? Math.round(Object.values(blocos).reduce((a,b)=>a+b.cob,0)/somaQ*100) : 0;
+
+      // retorno: questão × cobertura (onde falta e pesa)
+      const gap = doTj.map(d=>({n:d.nome,c:d.cor,v:d.peso.tjsp.q*(1-cob(d)),lbl:d.peso.tjsp.q+"q · "+Math.round(cob(d)*100)+"%",q:d.peso.tjsp.q,b:d.peso.tjsp.b}))
+                      .sort((a,b)=>b.v-a.v);
+
+      // blocos visuais
+      const bl = [
+        {n:"Bloco I — Língua Portuguesa",q:16,car:"Eliminatório na prática",desc:"Língua Portuguesa",cor:"#3b82f6",key:"I"},
+        {n:"Bloco II — Direito",q:30,car:"Núcleo de aprovação",desc:"Penal 6 · Proc. Penal 5 · Proc. Civil 5 · Legislação Interna 6 · Constitucional 4 · Administrativo 4",cor:"#ef4444",key:"II"},
+        {n:"Bloco III — Conhecimentos Gerais",q:24,car:"Apenas classificatório",desc:"Informática 9 · RLM 7 · Atualidades 4 · Matemática 4",cor:"#64748b",key:"III"}
+      ];
+
+      return `
+      <div class="grid g3" style="margin-bottom:16px">
+        <div class="card">
+          <div class="kl">Horas na frente TJ-SP</div>
+          <div class="kpi" style="color:var(--tjsp-b)">${n1(hTj)}<span style="font-size:16px;color:var(--dim)">h</span></div>
+          <div class="note" style="margin-top:4px">de ${n1(hTotal)}h registradas em concursos</div>
+          <div class="bar"><i style="width:${hTotal?Math.min(100,hTj/hTotal*100):0}%;background:var(--tjsp)"></i></div>
+        </div>
+        <div class="card">
+          <div class="kl">Cobertura da grade (ponderada)</div>
+          <div class="kpi" style="color:var(--ok)">${cobGeral}<span style="font-size:16px;color:var(--dim)">%</span></div>
+          <div class="note" style="margin-top:4px">${doTj.filter(d=>cob(d)===1).length} de ${doTj.length} disciplinas concluídas</div>
+          <div class="bar"><i style="width:${cobGeral}%;background:var(--ok)"></i></div>
+        </div>
+        <div class="card">
+          <div class="kl">Aproveitamento em questões</div>
+          <div class="kpi" style="color:${pct==null?"var(--dim)":(pct>=corte?"var(--ok)":"var(--bad)")}">${pct==null?"—":pct}<span style="font-size:16px;color:var(--dim)">%</span></div>
+          <div class="note" style="margin-top:4px">${qT} questões · corte de ${corte}% ${pct==null?"":(pct>=corte?"✔ acima":"✘ abaixo")}</div>
+          <div class="bar"><i style="width:${pct||0}%;background:${pct!=null&&pct>=corte?"var(--ok)":"var(--bad)"}"></i></div>
+        </div>
+      </div>
+
+      <div class="grid g2">
+        <div class="card">
+          <h2>Estrutura da prova — 70 questões</h2>
+          ${bl.map(b=>{
+            const bc = blocos[b.key]||{q:0,cob:0};
+            const p = b.q? Math.round(bc.cob/b.q*100):0;
+            return `<div class="bloco" style="border-color:${b.cor}">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
+                <strong style="font-size:14px">${esc(b.n)}</strong>
+                <span class="pill p-t" style="background:${b.cor}22;color:${b.cor}">${b.q} questões</span>
+              </div>
+              <div class="note" style="margin-top:5px">${esc(b.desc)}</div>
+              <div class="note" style="color:${b.cor};font-weight:700;margin-top:4px">${esc(b.car)} · cobertura ${p}%</div>
+              <div class="bar"><i style="width:${p}%;background:${b.cor}"></i></div>
+            </div>`;
+          }).join("")}
+          <div class="note" style="margin-top:12px">
+            <strong style="color:var(--txt)">Corte:</strong> 50% do conjunto dos três blocos.
+            O Bloco III <em>não</em> é eliminatório — serve para classificação.
+            Estude para passar nele, não para dominá-lo.
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Onde está o retorno — lacuna ponderada</h2>
+          <p class="note" style="margin-bottom:13px">Ordena por <strong>questões × (1 − cobertura)</strong>: o que pesa mais e está menos estudado aparece no topo.</p>
+          ${gap.map(g=>`<div style="margin-bottom:10px">
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px">
+                <span><span style="display:inline-block;width:7px;height:7px;border-radius:9px;background:${g.c};margin-right:7px"></span>${esc(g.n)}</span>
+                <span class="num" style="color:var(--dim)">${esc(g.lbl)}</span>
+              </div>
+              <div class="bar"><i style="width:${gap[0].v?g.v/gap[0].v*100:0}%;background:${g.c}"></i></div>
+            </div>`).join("")}
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h2>Disciplinas do TJ-SP — peso, cobertura e rendimento</h2>
+        <table class="tbl">
+          <thead><tr><th>Disciplina</th><th>Bloco</th><th class="num">Questões</th><th class="num">Horas</th><th>Cobertura</th><th class="num">Rend.</th><th>Alavancagem</th></tr></thead>
+          <tbody>
+          ${doTj.sort((a,b)=>b.peso.tjsp.q-a.peso.tjsp.q).map(d=>{
+            const h = horasDe(l=>l.disciplina===d.id);
+            const c = cob(d), r = rendDe(d);
+            return `<tr>
+              <td><span style="display:inline-block;width:8px;height:8px;border-radius:9px;background:${d.cor};margin-right:8px"></span>${esc(d.nome)}</td>
+              <td><span class="pill p-n">${esc(d.peso.tjsp.b)}</span></td>
+              <td class="num"><strong>${d.peso.tjsp.q}</strong></td>
+              <td class="num">${n1(h)}h</td>
+              <td style="min-width:110px"><div class="bar" style="margin:0"><i style="width:${c*100}%;background:${d.cor}"></i></div><span class="note">${Math.round(c*100)}%</span></td>
+              <td class="num">${r.pct==null?'<span class="note">—</span>':(r.pct>=corte?'<span class="pill p-ok">'+r.pct+'%</span>':'<span class="pill p-b">'+r.pct+'%</span>')}</td>
+              <td>${(d.car||[]).map(k=>`<span class="chip"><i style="background:${car(k).cor}"></i>${esc(car(k).nome)}</span>`).join("")}</td>
+            </tr>`;
+          }).join("")}
+          </tbody>
+        </table>
+        <p class="note" style="margin-top:12px">Alavancagem = em quantas frentes a disciplina é cobrada. Uma hora de Língua Portuguesa paga para TJ-SP, RFB, CGU e TCU ao mesmo tempo.</p>
+      </div>`;
+    }
+    
+    /* ===== ABA: REGISTRO DIÁRIO ===== */
+    function viewLog(){
+      const hoje = new Date().toISOString().slice(0,10);
+      const ult = S.log.slice(0,12);
+
+      return `
+      <div class="card" style="margin-bottom:16px">
+        <h2>Lançar sessão de estudo</h2>
+        <div class="grid g3" style="gap:11px">
+          <div><label>Data</label><input type="date" id="f-data" value="${hoje}"></div>
+          <div><label>Frente</label><select id="f-carreira">${S.carreiras.map(c=>`<option value="${c.id}"${c.ativo?" selected":""}>${esc(c.nome)}</option>`).join("")}</select></div>
+          <div><label>Disciplina</label><select id="f-disc">${S.disciplinas.map(d=>`<option value="${d.id}">${esc(d.nome)}</option>`).join("")}</select></div>
+          <div><label>Tema / subtema</label><select id="f-tema"></select></div>
+          <div><label>Horas</label><input type="number" id="f-horas" step="0.25" min="0" placeholder="1.5"></div>
+          <div><label>Tipo</label><select id="f-tipo"><option value="teoria">Teoria</option><option value="questoes">Questões</option><option value="revisao">Revisão</option></select></div>
+          <div><label>Questões feitas</label><input type="number" id="f-q" min="0" placeholder="—"></div>
+          <div><label>Acertos</label><input type="number" id="f-ok" min="0" placeholder="—"></div>
+          <div><label>Fonte / observação</label><input type="text" id="f-obs" placeholder="PDF aula 1, pág. 5–40"></div>
+        </div>
+        <div class="row" style="margin-top:14px">
+          <button class="b pri" onclick="addLog()">Registrar sessão</button>
+          <span class="note" id="log-msg"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Últimas sessões</h2>
+        ${S.log.length? `<table class="tbl">
+          <thead><tr><th>Data</th><th>Frente</th><th>Disciplina</th><th>Tema</th><th>Tipo</th><th class="num">Horas</th><th class="num">Questões</th><th class="num">Acertos</th><th></th></tr></thead>
+          <tbody>${S.log.slice(0,40).map((l,i)=>`<tr>
+            <td class="mono">${esc(l.data)}</td>
+            <td><span class="chip"><i style="background:${car(l.carreira).cor}"></i>${esc(car(l.carreira).nome)}</span></td>
+            <td>${esc(disc(l.disciplina).nome)}</td>
+            <td class="note">${esc(l.tema||"—")}</td>
+            <td><span class="pill p-n">${esc(l.tipo)}</span></td>
+            <td class="num">${n1(l.horas)}h</td>
+            <td class="num">${l.questoes||"—"}</td>
+            <td class="num">${l.acertos||"—"}</td>
+            <td><button class="b dg" style="padding:4px 10px" onclick="delLog(${S.log.indexOf(l)})">×</button></td>
+          </tr>`).join("")}</tbody></table>`
+        : `<div class="empty">Nenhuma sessão registrada ainda.<br>Comece lançando o estudo de <strong>Classes de Palavras I</strong>.</div>`}
+      </div>`;
+    }
+
+    function fillTemas(){
+      const d = disc($("#f-disc").value);
+      const sel = $("#f-tema");
+      sel.innerHTML = `<option value="">— geral —</option>` + (d.subs||[]).map(s=>`<option value="${esc(s.nome)}">${esc(s.nome)}</option>`).join("");
+    }
+    function addLog(){
+      const h = Number($("#f-horas").value);
+      if(!h || h<=0){ $("#log-msg").textContent = "Informe as horas."; return; }
+      const q = $("#f-q").value, ok = $("#f-ok").value;
+      S.log.unshift({
+        data: $("#f-data").value, carreira: $("#f-carreira").value, disciplina: $("#f-disc").value,
+        tema: $("#f-tema").value || "geral", horas: h, tipo: $("#f-tipo").value,
+        questoes: q? Number(q):0, acertos: ok? Number(ok):0, obs: $("#f-obs").value
+      });
+      save();
+      $("#log-msg").textContent = "Sessão registrada ✔";
+      $("#f-horas").value=""; $("#f-q").value=""; $("#f-ok").value=""; $("#f-obs").value="";
+      const pane = $("#p-log"); pane.innerHTML = viewLog(); fillTemas();
+      setTimeout(()=>{ const m=$("#log-msg"); if(m) m.textContent=""; }, 2500);
+    }
+    function delLog(i){ S.log.splice(i,1); save(); $("#p-log").innerHTML = viewLog(); }
+    
+    /* ===== ABA: DISCIPLINAS & TEMAS (editor — o "B") ===== */
+    let aberto = {};
+    function viewDisc(){
+      return `
+      <div class="card" style="margin-bottom:16px">
+        <h2>Nova disciplina</h2>
+        <div class="grid g3" style="gap:11px">
+          <div class="f"><label>Nome</label><input id="d-nome" placeholder="ex.: Legislação Aduaneira"></div>
+          <div class="f"><label>Cor</label><input id="d-cor" type="color" value="#d9660a" style="height:39px;padding:3px"></div>
+          <div class="f"><label>Questões — TJ-SP</label><input id="d-q-tj" type="number" min="0" placeholder="0"></div>
+          <div class="f"><label>Bloco — TJ-SP</label><select id="d-b-tj"><option value="I">I</option><option value="II" selected>II</option><option value="III">III</option></select></div>
+          <div class="f"><label>Questões — RFB</label><input id="d-q-rfb" type="number" min="0" placeholder="0"></div>
+          <div class="f"><label>Módulo — RFB</label><select id="d-b-rfb"><option value="Básicos">Básicos</option><option value="Específicos">Específicos</option></select></div>
+        </div>
+        <div class="row" style="margin-top:14px"><button class="b pri" onclick="addDisc()">Adicionar disciplina</button>
+        <span class="note">Marque a quais frentes ela serve depois, no cartão da disciplina.</span></div>
+      </div>
+
+      <div class="row" style="margin-bottom:14px">
+        <strong style="font-size:14px">${S.disciplinas.length} disciplinas · ${S.disciplinas.reduce((a,d)=>a+(d.subs||[]).length,0)} temas</strong>
+        <button class="b" style="margin-left:auto" onclick="expJSON()">Exportar JSON</button>
+      </div>
+
+      <div class="grid g2">
+      ${S.disciplinas.map(d=>{
+        const h = horasDe(l=>l.disciplina===d.id), r = rendDe(d), c = cob(d);
+        const ab = aberto[d.id];
+        return `<div class="card">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+            <div>
+              <div style="font-weight:700;font-size:15px"><span style="display:inline-block;width:9px;height:9px;border-radius:9px;background:${d.cor};margin-right:8px"></span>${esc(d.nome)}</div>
+              <div class="note" style="margin-top:4px">${n1(h)}h · cobertura ${Math.round(c*100)}% · rendimento ${r.pct==null?"—":r.pct+"%"}</div>
+            </div>
+            <div class="row" style="gap:6px">
+              <button class="b" style="padding:5px 11px" onclick="toggle('${d.id}')">${ab?"Fechar":"Editar"}</button>
+            </div>
+          </div>
+          <div style="margin-top:9px">
+            ${S.carreiras.map(k=>`<span class="chip" style="cursor:pointer;${(d.car||[]).includes(k.id)?"border-color:"+k.cor+";color:"+k.cor:""}" onclick="toggleCar('${d.id}','${k.id}')"><i style="background:${k.cor}"></i>${esc(k.nome)}</span>`).join("")}
+          </div>
+          ${ab? `<div style="margin-top:14px;border-top:1px solid var(--line);padding-top:14px">
+            <div class="grid g2" style="gap:9px">
+              <div><label>Nome</label><input value="${esc(d.nome)}" onchange="setD('${d.id}','nome',this.value)"></div>
+              <div><label>Cor</label><input type="color" value="${d.cor}" onchange="setD('${d.id}','cor',this.value)" style="height:39px;padding:3px"></div>
+              <div><label>Questões TJ-SP</label><input type="number" min="0" value="${d.peso.tjsp?d.peso.tjsp.q:""}" onchange="setPeso('${d.id}','tjsp','q',this.value)"></div>
+              <div><label>Bloco TJ-SP</label><select onchange="setPeso('${d.id}','tjsp','b',this.value)">
+                ${["I","II","III"].map(b=>`<option ${d.peso.tjsp&&d.peso.tjsp.b===b?"selected":""}>${b}</option>`).join("")}</select></div>
+              <div><label>Questões RFB</label><input type="number" min="0" value="${d.peso.rfb?d.peso.rfb.q:""}" onchange="setPeso('${d.id}','rfb','q',this.value)"></div>
+              <div><label>Módulo RFB</label><select onchange="setPeso('${d.id}','rfb','b',this.value)">
+                ${["Básicos","Específicos"].map(b=>`<option ${d.peso.rfb&&d.peso.rfb.b===b?"selected":""}>${b}</option>`).join("")}</select></div>
+            </div>
+            <h3>Temas</h3>
+            ${(d.subs||[]).map(s=>`<div style="background:var(--bg2);border-radius:9px;padding:11px;margin-bottom:8px">
+              <div class="row" style="gap:8px">
+                <input style="flex:2" value="${esc(s.nome)}" onchange="setS('${d.id}','${s.id}','nome',this.value)">
+                <select style="width:auto" onchange="setS('${d.id}','${s.id}','st',this.value)">
+                  ${[["nao_iniciado","Não iniciado"],["estudando","Estudando"],["revisar","Revisar"],["concluido","Concluído"]].map(o=>`<option value="${o[0]}" ${s.st===o[0]?"selected":""}>${o[1]}</option>`).join("")}
+                </select>
+                <button class="b dg" style="padding:6px 11px" onclick="delS('${d.id}','${s.id}')">×</button>
+              </div>
+              <div class="row" style="gap:8px;margin-top:8px">
+                <input style="flex:1" placeholder="fonte (PDF, aula)" value="${esc(s.fonte||"")}" onchange="setS('${d.id}','${s.id}','fonte',this.value)">
+                <input style="width:110px" placeholder="páginas" value="${esc(s.pag||"")}" onchange="setS('${d.id}','${s.id}','pag',this.value)">
+              </div>
+              <textarea rows="2" placeholder="subtemas, um por linha" style="margin-top:8px" onchange="setSubs('${d.id}','${s.id}',this.value)">${esc((s.subs||[]).join("\n"))}</textarea>
+            </div>`).join("")}
+            <div class="row"><input id="nt-${d.id}" placeholder="novo tema (ex.: Crase e pontuação)"><button class="b" onclick="addS('${d.id}')">+ Tema</button></div>
+            <div class="row" style="margin-top:14px"><button class="b dg" onclick="delD('${d.id}')">Excluir disciplina</button></div>
+          </div>`:""}
+        </div>`;
+      }).join("")}
+      </div>`;
+    }
+    function toggle(id){ aberto[id]=!aberto[id]; $("#p-disc").innerHTML = viewDisc(); }
+    function setD(id,k,v){ disc(id)[k]=v; save(); $("#p-disc").innerHTML = viewDisc(); }
+    function setPeso(id,c,k,v){ const d=disc(id); d.peso=d.peso||{}; d.peso[c]=d.peso[c]||{q:0,b:""}; d.peso[c][k]= k==="q"? (Number(v)||0) : v; if(d.peso[c].q===0){ delete d.peso[c]; } save(); }
+    function toggleCar(id,k){ const d=disc(id); d.car=d.car||[]; const i=d.car.indexOf(k); i<0? d.car.push(k) : d.car.splice(i,1); save(); $("#p-disc").innerHTML = viewDisc(); }
+    function addDisc(){
+      const n=$("#d-nome").value.trim(); if(!n) return;
+      const d={id:"d"+Date.now(),nome:n,cor:$("#d-cor").value,car:[],peso:{},rend:{ok:0,tt:0},subs:[]};
+      const qt=Number($("#d-q-tj").value), qr=Number($("#d-q-rfb").value);
+      if(qt){ d.peso.tjsp={q:qt,b:$("#d-b-tj").value}; d.car.push("tjsp"); }
+      if(qr){ d.peso.rfb={q:qr,b:$("#d-b-rfb").value}; d.car.push("rfb"); }
+      S.disciplinas.push(d); save(); $("#p-disc").innerHTML = viewDisc();
+    }
+    function delD(id){ if(!confirm("Excluir esta disciplina e seus temas?")) return; S.disciplinas = S.disciplinas.filter(d=>d.id!==id); save(); $("#p-disc").innerHTML = viewDisc(); }
+    function addS(id){ const el=$("#nt-"+id); const v=el.value.trim(); if(!v) return;
+      disc(id).subs.push({id:"s"+Date.now(),nome:v,fonte:"a enviar",pag:"",inc:"media",st:"nao_iniciado",subs:[]}); save(); $("#p-disc").innerHTML = viewDisc(); }
+    function delS(id,sid){ const d=disc(id); d.subs=d.subs.filter(s=>s.id!==sid); save(); $("#p-disc").innerHTML = viewDisc(); }
+    function setS(id,sid,k,v){ const s=disc(id).subs.find(x=>x.id===sid); s[k]=v; save(); }
+    function setSubs(id,sid,v){ const s=disc(id).subs.find(x=>x.id===sid); s.subs=v.split("\n").map(x=>x.trim()).filter(Boolean); save(); }
+    
+    /* ===== ABA: FRENTES DE LASTRO ===== */
+    function viewLastro(){
+      return `
+      <div class="card" style="margin-bottom:16px">
+        <h2>Como ler o lastro</h2>
+        <p class="note">Estas frentes não têm painel dedicado nesta versão. Elas existem como <strong>lastro</strong>: conteúdo que se acumula enquanto a frente ativa (TJ-SP) roda, e que será reaproveitado quando o edital se aproximar. A prioridade é dada por horizonte — não por gosto nem por sequência do edital.</p>
+      </div>
+      <div class="grid g2">
+      ${S.carreiras.filter(c=>c.id!=="tjsp"&&c.id!=="pos").map(c=>{
+        const h = horasDe(l=>l.carreira===c.id);
+        const dl = S.disciplinas.filter(d=>d.peso && d.peso[c.id]);
+        return `<div class="card" style="border-left:3px solid ${c.cor}">
+          <div style="display:flex;justify-content:space-between;align-items:baseline"><strong style="font-size:16px">${esc(c.nome)}</strong>
+          <span class="pill p-n">horizonte ${esc(c.horizonte)}</span></div>
+          <div class="note" style="margin-top:6px">${esc(c.cargo)} · ${esc(c.nio)} · ${esc(c.sal)} · banca ${esc(c.banca)}</div>
+          <div class="note" style="margin-top:8px;color:var(--warn)">${esc(c.status)}</div>
+          ${(c.blocos||[]).map(b=>`<div class="bloco" style="border-color:${c.cor};margin-top:11px">
+            <strong style="font-size:13px">${esc(b.n)}${b.q?" · "+b.q+" questões":""}</strong>
+            <div class="note" style="margin-top:4px">${esc(b.desc)}</div></div>`).join("")}
+          <div class="note" style="margin-top:12px">${dl.length} disciplinas da grade · <strong>${n1(h)}h</strong> já registradas</div>
+          <div style="margin-top:9px">${dl.map(d=>`<span class="chip"><i style="background:${d.cor}"></i>${esc(d.nome)}${d.peso[c.id].q?" ("+d.peso[c.id].q+"q)":""}</span>`).join("")}</div>
+        </div>`;
+      }).join("")}
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h2>Alavancagem — quantas frentes cada disciplina atende</h2>
+        <table class="tbl">
+          <thead><tr><th>Disciplina</th><th class="num">Frentes</th><th>Onde é cobrada</th></tr></thead>
+          <tbody>
+          ${S.disciplinas.map(d=>({d,n:(d.car||[]).length})).sort((a,b)=>b.n-a.n).map(x=>`<tr>
+            <td><span style="display:inline-block;width:8px;height:8px;border-radius:9px;background:${x.d.cor};margin-right:8px"></span>${esc(x.d.nome)}</td>
+            <td class="num"><strong style="color:${x.n>=4?"var(--ok)":x.n>=2?"var(--warn)":"var(--dim2)"}">${x.n}</strong></td>
+            <td>${(x.d.car||[]).map(k=>`<span class="chip"><i style="background:${car(k).cor}"></i>${esc(car(k).nome)}</span>`).join("")||'<span class="note">— especificar no editor</span>'}</td>
+          </tr>`).join("")}
+          </tbody>
+        </table>
+        <p class="note" style="margin-top:12px">Regra de decisão: quando o tempo é curto, a ordem é <strong>peso no edital × alavancagem</strong>. A disciplina que aparece em 4 frentes rende quatro vezes — desde que o edital mais próximo também a cobre.</p>
+      </div>`;
+    }
+    
+    /* ===== ABA: DADOS ===== */
+    function viewDados(){
+      const total = horasDe(()=>true);
+      const porTipo = ["teoria","questoes","revisao"].map(t=>({t,v:horasDe(l=>l.tipo===t)}));
+      const porFrente = S.carreiras.map(c=>({n:c.nome,c:c.cor,v:horasDe(l=>l.carreira===c.id)}));
+      const qs = S.log.reduce((a,l)=>a+(Number(l.questoes)||0),0);
+      const ok = S.log.reduce((a,l)=>a+(Number(l.acertos)||0),0);
+
+      return `
+      <div class="grid g3" style="margin-bottom:16px">
+        <div class="card"><div class="kl">Horas totais registradas</div><div class="kpi" style="color:var(--tjsp-b)">${n1(total)}<span style="font-size:16px;color:var(--dim)">h</span></div><div class="note" style="margin-top:4px">${S.log.length} sessões</div></div>
+        <div class="card"><div class="kl">Questões resolvidas</div><div class="kpi" style="color:var(--rfb)">${qs}</div><div class="note" style="margin-top:4px">${qs?Math.round(ok/qs*100)+"% de acerto global":"sem registros"}</div></div>
+        <div class="card"><div class="kl">Horas na frente ativa</div><div class="kpi" style="color:var(--ok)">${n1(horasDe(l=>l.carreira==="tjsp"))}<span style="font-size:16px;color:var(--dim)">h</span></div><div class="note" style="margin-top:4px">TJ-SP · frente prioritária</div></div>
+      </div>
+      <div class="grid g2">
+        <div class="card"><h2>Horas por frente</h2>
+          ${porFrente.some(x=>x.v>0)? barsH(porFrente.map(x=>({n:x.n,c:x.c,v:x.v,lbl:n1(x.v)+"h"})), total) : '<div class="empty">Sem registros ainda.</div>'}
+        </div>
+        <div class="card"><h2>Horas por tipo de estudo</h2>
+          ${total? barsH(porTipo.map(x=>({n:{teoria:"Teoria",questoes:"Questões",revisao:"Revisão"}[x.t],c:"#8b5cf6",v:x.v,lbl:n1(x.v)+"h"})), total) : '<div class="empty">Sem registros ainda.</div>'}
+          <p class="note" style="margin-top:12px">Equilíbrio saudável na reta final: cerca de 40% teoria, 40% questões, 20% revisão.</p>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h2>Backup e restauração</h2>
+        <p class="note" style="margin-bottom:13px">O painel vive no seu navegador. Exporte o JSON com regularidade — é o único backup do seu histórico.</p>
+        <div class="row">
+          <button class="b pri" onclick="expJSON()">Exportar JSON</button>
+          <button class="b" onclick="$('#imp-file').click()">Importar JSON</button>
+          <input type="file" id="imp-file" accept=".json" class="hide" onchange="impJSON(this)">
+          <button class="b dg" onclick="reset()">Restaurar padrão</button>
+          <button class="b" onclick="expCSV()">Exportar log em CSV</button>
+        </div>
+      </div>
+    
+      <div class="card" style="margin-top:16px">
+        <h2>Curva de retenção — aproveitamento em questões por disciplina</h2>
+        ${(()=>{
+          const pts = S.log.filter(l=>Number(l.questoes)>0).slice().sort((a,b)=>(a.data>b.data?1:-1));
+          if(pts.length<2) return '<div class="empty">A curva aparece a partir da segunda sessão com questões registradas.<br><span class="note">Mínimo útil: cerca de 6 registros ao longo de 2–3 semanas.</span></div>';
+          const W=760,H=250,P={l:44,r:16,t:16,b:34};
+          const xs = pts.map((p,i)=>P.l + (i/(pts.length-1))*(W-P.l-P.r));
+          const ys = pts.map(p=>{ const t=Number(p.questoes), o=Number(p.acertos)||0; const pct=t?o/t*100:0; return H-P.b - (pct/100)*(H-P.t-P.b); });
+          const linha = xs.map((x,i)=>`${i?"L":"M"}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(" ");
+          const area = linha + ` L${xs[xs.length-1].toFixed(1)},${H-P.b} L${xs[0].toFixed(1)},${H-P.b} Z`;
+          const grades = [0,25,50,75,100].map(g=>{ const y=H-P.b-(g/100)*(H-P.t-P.b);
+            return `<line x1="${P.l}" x2="${W-P.r}" y1="${y}" y2="${y}" stroke="#2b3348" stroke-dasharray="3 4"/>
+                    <text x="${P.l-8}" y="${y+4}" text-anchor="end" fill="#6b7694" font-size="10">${g}%</text>`; }).join("");
+          const corte = 50; const yc = H-P.b-(corte/100)*(H-P.t-P.b);
+          const pontos = pts.map((p,i)=>`<circle cx="${xs[i].toFixed(1)}" cy="${ys[i].toFixed(1)}" r="4" fill="${car(p.carreira).cor}"><title>${esc(p.data)} · ${esc(disc(p.disciplina).nome)} · ${p.acertos}/${p.questoes} (${Math.round(p.acertos/p.questoes*100)}%)</title></circle>`).join("");
+          const eixoX = [0, Math.floor(pts.length/2), pts.length-1].map(i=>`<text x="${xs[i].toFixed(1)}" y="${H-12}" text-anchor="middle" fill="#6b7694" font-size="10">${esc(pts[i].data.slice(5))}</text>`).join("");
+          // media por disciplina
+          const porDisc = {};
+          pts.forEach(p=>{ const k=p.disciplina; porDisc[k]=porDisc[k]||{ok:0,tt:0,n:0}; porDisc[k].ok+=Number(p.acertos)||0; porDisc[k].tt+=Number(p.questoes); porDisc[k].n++; });
+          const lista = Object.keys(porDisc).map(k=>({d:disc(k),pct:Math.round(porDisc[k].ok/porDisc[k].tt*100),n:porDisc[k].n})).sort((a,b)=>b.pct-a.pct);
+          return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;margin-bottom:6px" role="img" aria-label="Curva de aproveitamento">
+            <defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#d9660a" stop-opacity=".35"/><stop offset="100%" stop-color="#d9660a" stop-opacity="0"/>
+            </linearGradient></defs>
+            ${grades}
+            <line x1="${P.l}" x2="${W-P.r}" y1="${yc}" y2="${yc}" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="6 4"/>
+            <text x="${W-P.r}" y="${yc-6}" text-anchor="end" fill="#ef4444" font-size="10" font-weight="700">corte 50%</text>
+            <path d="${area}" fill="url(#ga)"/>
+            <path d="${linha}" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linejoin="round"/>
+            ${pontos}${eixoX}
+          </svg>
+          <div class="legend">${[...new Set(pts.map(p=>p.carreira))].map(c=>`<span><i style="background:${car(c).cor}"></i>${esc(car(c).nome)}</span>`).join("")}</div>
+          <table class="tbl" style="margin-top:14px">
+            <thead><tr><th>Disciplina</th><th class="num">Sessões com questões</th><th class="num">Aproveitamento médio</th><th>Situação</th></tr></thead>
+            <tbody>${lista.map(x=>`<tr><td><span style="display:inline-block;width:8px;height:8px;border-radius:9px;background:${x.d.cor};margin-right:8px"></span>${esc(x.d.nome)}</td>
+              <td class="num">${x.n}</td><td class="num"><strong>${x.pct}%</strong></td>
+              <td>${x.pct>=70?'<span class="pill p-ok">consolidando</span>':x.pct>=50?'<span class="pill p-w">em evolução</span>':'<span class="pill p-b">revisar teoria</span>'}</td></tr>`).join("")}</tbody>
+          </table>`;
+        })()}
+      </div>
+      `;
+    }
+    function baixar(nome, texto, mime){
+      const b = new Blob([texto], {type:mime||"application/json;charset=utf-8"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(b); a.download = nome; a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 1500);
+    }
+    function expJSON(){ baixar("painel-formacao-"+new Date().toISOString().slice(0,10)+".json", JSON.stringify(S,null,2)); }
+    function expCSV(){
+      const cab = ["data","frente","disciplina","tema","horas","tipo","questoes","acertos","obs"];
+      const linhas = S.log.map(l=>[l.data,car(l.carreira).nome,disc(l.disciplina).nome,l.tema,l.horas,l.tipo,l.questoes||"",l.acertos||"",(l.obs||"").replace(/;/g,",")]);
+      const csv = [cab, ...linhas].map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(";")).join("\n");
+      baixar("registro-estudos.csv", "\ufeff"+csv, "text/csv;charset=utf-8");
+    }
+    function impJSON(el){
+      const f = el.files[0]; if(!f) return;
+      const r = new FileReader();
+      r.onload = e => { try{ const d = JSON.parse(e.target.result); if(!d.disciplinas) throw 0; S = d; save(); render(); alert("Dados importados com sucesso."); }catch(err){ alert("Arquivo inválido."); } };
+      r.readAsText(f); el.value="";
+    }
+
+    
+    
+    /* ===== ABA: PÓS-GRADUAÇÃO (painel próprio) ===== */
+    function viewPos(){
+      const cur = S.pos && S.pos.curso ? S.pos.curso : {nome:"MBA Data Science e Analytics",inst:"—",inicio:"",fim:"",creditos:0,cumpridos:0};
+      const mods = (S.pos && S.pos.modulos) || [];
+      const tot = mods.length;
+      const conc = mods.filter(m=>m.st==="concluido").length;
+      const pct = tot? Math.round(conc/tot*100):0;
+      const hPos = horasDe(l=>l.carreira==="pos");
+      const prazos = mods.filter(m=>m.prazo).sort((a,b)=>(a.prazo>b.prazo?1:-1));
+
+      return `
+      <div class="card" style="margin-bottom:16px">
+        <h2>Por que a pós tem painel separado</h2>
+        <p class="note">Concurso se mede em acerto sob pressão de banca e edital com data. Pós se mede em módulos, créditos e prazos acadêmicos. As duas métricas não são comparáveis — então esta frente <strong>não entra no cálculo de alavancagem</strong> dos concursos. O que as une é o mesmo registro diário: lance a sessão na aba Registro escolhendo a frente Pós-graduação e ela aparece aqui automaticamente.</p>
+      </div>
+
+      <div class="grid g3" style="margin-bottom:16px">
+        <div class="card"><div class="kl">Módulos concluídos</div>
+          <div class="kpi" style="color:var(--pos)">${conc}<span style="font-size:16px;color:var(--dim)">/${tot}</span></div>
+          <div class="bar"><i style="width:${pct}%;background:var(--pos)"></i></div>
+          <div class="note" style="margin-top:6px">${pct}% do curso</div></div>
+        <div class="card"><div class="kl">Horas registradas na pós</div>
+          <div class="kpi" style="color:var(--pos)">${n1(hPos)}<span style="font-size:16px;color:var(--dim)">h</span></div>
+          <div class="note" style="margin-top:6px">frente contínua, sem linha de chegada</div></div>
+        <div class="card"><div class="kl">Sequência contínua</div>
+          <div class="kpi" style="color:var(--ok)">${mesesSeguidos()}<span style="font-size:16px;color:var(--dim)"> meses</span></div>
+          <div class="note" style="margin-top:6px">meses consecutivos com registro — o indicador que importa aqui</div></div>
+      </div>
+
+      <div class="grid g2">
+        <div class="card">
+          <h2>Curso</h2>
+          <div class="grid g2" style="gap:10px">
+            <div><label>Nome do curso</label><input value="${esc(cur.nome)}" onchange="setPos('curso','nome',this.value)"></div>
+            <div><label>Instituição</label><input value="${esc(cur.inst||"")}" onchange="setPos('curso','inst',this.value)"></div>
+            <div><label>Início</label><input type="month" value="${esc(cur.inicio||"")}" onchange="setPos('curso','inicio',this.value)"></div>
+            <div><label>Previsão de término</label><input type="month" value="${esc(cur.fim||"")}" onchange="setPos('curso','fim',this.value)"></div>
+          </div>
+          <h3>Módulos e disciplinas</h3>
+          ${mods.map(m=>`<div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:9px">
+            <div class="row" style="gap:8px">
+              <input style="flex:2" value="${esc(m.nome)}" onchange="setMod('${m.id}','nome',this.value)" placeholder="nome do módulo">
+              <select style="width:auto" onchange="setMod('${m.id}','st',this.value)">
+                ${[["nao_iniciado","Não iniciado"],["cursando","Cursando"],["concluido","Concluído"],["tcc","TCC / trabalho final"]].map(o=>`<option value="${o[0]}" ${m.st===o[0]?"selected":""}>${o[1]}</option>`).join("")}
+              </select>
+              <button class="b dg" style="padding:6px 11px" onclick="delMod('${m.id}')">×</button>
+            </div>
+            <div class="row" style="gap:8px;margin-top:8px">
+              <input type="date" style="width:auto" value="${esc(m.prazo||"")}" onchange="setMod('${m.id}','prazo',this.value)">
+              <input style="flex:1" placeholder="observação (professor, ementa, nota)" value="${esc(m.obs||"")}" onchange="setMod('${m.id}','obs',this.value)">
+            </div>
+          </div>`).join("")}
+          <div class="row"><input id="nm-pos" placeholder="novo módulo (ex.: Estatística Aplicada)">
+            <button class="b pri" onclick="addMod()">+ Módulo</button></div>
+        </div>
+
+        <div class="card">
+          <h2>Prazos acadêmicos</h2>
+          ${prazos.length? prazos.map(m=>{
+            const d = Math.ceil((new Date(m.prazo) - new Date())/86400000);
+            const cor = d<0 ? "var(--dim2)" : d<=15 ? "var(--bad)" : d<=45 ? "var(--warn)" : "var(--ok)";
+            const lbl = d<0 ? "vencido" : d===0 ? "hoje" : d+" dias";
+            return `<div class="bloco" style="border-color:${cor}">
+              <div style="display:flex;justify-content:space-between;gap:9px">
+                <strong style="font-size:13.5px">${esc(m.nome)}</strong>
+                <span class="pill" style="background:${cor}22;color:${cor}">${lbl}</span>
+              </div>
+              <div class="note" style="margin-top:4px">${esc(m.prazo)}${m.obs?" · "+esc(m.obs):""}</div>
+            </div>`;
+          }).join("") : '<div class="empty">Nenhum módulo com prazo definido.</div>'}
+
+          <h3>Horas por mês na pós</h3>
+          ${(()=>{ const s = horasPorMes("pos"); return s.length? barsH(s.map(x=>({n:x.m,c:"#06b6d4",v:x.h,lbl:n1(x.h)+"h"}))) : '<div class="empty" style="padding:14px">Sem registros na frente Pós-graduação ainda.</div>'; })()}
+        </div>
+      </div>`;
+    }
+    function horasPorMes(car){
+      const m = {};
+      S.log.filter(l=>l.carreira===car).forEach(l=>{ const k=(l.data||"").slice(0,7); if(k) m[k]=(m[k]||0)+(Number(l.horas)||0); });
+      return Object.keys(m).sort().map(k=>({m:k,h:m[k]}));
+    }
+    function mesesSeguidos(){
+      const k = horasPorMes("pos").map(x=>x.m).sort();
+      if(!k.length) return 0;
+      let n=1; const hoje = new Date();
+      let cur = new Date(k[k.length-1]+"-01");
+      for(let i=k.length-2;i>=0;i--){
+        const prev = new Date(k[i]+"-01");
+        const diff = (cur.getFullYear()-prev.getFullYear())*12 + (cur.getMonth()-prev.getMonth());
+        if(diff===1){ n++; cur=prev; } else break;
+      }
+      return n;
+    }
+    function setPos(g,k,v){ S.pos = S.pos||{}; S.pos[g]=S.pos[g]||{}; S.pos[g][k]=v; save(); }
+    function setMod(id,k,v){ const m=S.pos.modulos.find(x=>x.id===id); m[k]=v; save(); $("#p-pos").innerHTML=viewPos(); }
+    function delMod(id){ if(!confirm("Excluir este módulo?")) return; S.pos.modulos=S.pos.modulos.filter(x=>x.id!==id); save(); $("#p-pos").innerHTML=viewPos(); }
+    function addMod(){ const el=$("#nm-pos"); const v=el.value.trim(); if(!v) return;
+      S.pos.modulos.push({id:"m"+Date.now(),nome:v,st:"nao_iniciado",prazo:"",obs:""}); save(); $("#p-pos").innerHTML=viewPos(); }
+
+    /* ===== ABA: ACERVO VISUAL & PDFs ===== */
+    /* Persistência do acervo: IndexedDB para imagens/PDFs grandes (não estoura o localStorage) */
+    let DB=null;
+    function openDB(){
+      return new Promise(res=>{
+        if(DB) return res(DB);
+        const r = indexedDB.open("acervo-estudos", 1);
+        r.onupgradeneeded = e => {
+          const d = e.target.result;
+          if(!d.objectStoreNames.contains("arquivos")) d.createObjectStore("arquivos", {keyPath:"id"});
+          if(!d.objectStoreNames.contains("meta")) d.createObjectStore("meta", {keyPath:"id"});
+        };
+        r.onsuccess = e => { DB = e.target.result; res(DB); };
+        r.onerror = () => res(null);
+      });
+    }
+    async function dbPut(store, obj){ const d = await openDB(); if(!d) return; return new Promise(res=>{ const t=d.transaction(store,"readwrite"); t.objectStore(store).put(obj); t.oncomplete=()=>res(true); t.onerror=()=>res(false); }); }
+    async function dbAll(store){ const d = await openDB(); if(!d) return []; return new Promise(res=>{ const t=d.transaction(store,"readonly"); const q=t.objectStore(store).getAll(); q.onsuccess=()=>res(q.result||[]); q.onerror=()=>res([]); }); }
+    async function dbDel(store,id){ const d = await openDB(); if(!d) return; return new Promise(res=>{ const t=d.transaction(store,"readwrite"); t.objectStore(store).delete(id); t.oncomplete=()=>res(true); }); }
+
+    let ACERVO = [];   // imagens: {id,nome,tipo,blob,url,legenda,grupo,ts}
+    let PDFS = [];     // pdfs: {id,nome,tipo,blob,url,tamanho,disciplina,tema,status,ts}
+
+    function fmt(v){ return v>1048576 ? (v/1048576).toFixed(1)+" MB" : Math.round(v/1024)+" KB"; }
+
+    function viewAcervo(){
+      const grupos = ["Carreiras & estratégia","Mapas mentais","Resumos & pôsteres","Material de aula"];
+      return `
+      <div class="card" style="margin-bottom:16px">
+        <h2>Como o acervo funciona</h2>
+        <p class="note">Imagens e PDFs ficam guardados <strong>no seu próprio navegador</strong> (IndexedDB), não em servidor nenhum. Nada de limite de 5 MB do localStorage — cabe aula inteira aqui. Use o campo <strong>Grupo</strong> para organizar por concurso e o botão de vincular para amarrar o PDF à disciplina e ao tema, criando o elo com o registro diário.</p>
+      </div>
+
+      <div class="card" style="margin-bottom:16px">
+        <h2>Mapas mentais e infográficos</h2>
+        <div class="drop" id="drop-img" onclick="$('#in-img').click()">
+          <strong style="color:var(--txt);font-size:15px">Arraste as imagens aqui</strong><br>
+          <span class="note">ou clique para escolher — PNG, JPG, WEBP, SVG</span>
+        </div>
+        <input type="file" id="in-img" class="hide" accept="image/*" multiple onchange="addImgs(this)">
+        <div class="row" style="margin-top:12px">
+          <div class="f"><label>Grupo</label><select id="g-img">${grupos.map(g=>`<option>${g}</option>`).join("")}</select></div>
+          <div class="f"><label>Legenda (opcional)</label><input id="l-img" placeholder="ex.: Mapa mental das carreiras — 14/09/26"></div>
+        </div>
+        <div class="gal" style="margin-top:16px" id="gal">
+          ${ACERVO.length? ACERVO.slice().reverse().map(a=>`<figure onclick="lb('${a.url}')">
+            <img src="${a.url}" alt="${esc(a.nome)}">
+            <figcaption><b>${esc(a.legenda||a.nome)}</b>${esc(a.grupo)} · ${fmt(a.blob.size)}
+              <div style="margin-top:7px"><button class="b dg" style="padding:3px 9px" onclick="event.stopPropagation();delImg('${a.id}')">×</button></div>
+            </figcaption></figure>`).join("")
+          : '<div class="empty" style="grid-column:1/-1">Nenhuma imagem no acervo ainda.<br>Comece subindo os dois mapas mentais de carreiras e o pôster de Classes I.</div>'}
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>PDFs das aulas</h2>
+        <div class="drop" id="drop-pdf" onclick="$('#in-pdf').click()">
+          <strong style="color:var(--txt);font-size:15px">Arraste os PDFs das aulas aqui</strong><br>
+          <span class="note">ou clique para escolher — ficam com nome, tamanho e vínculo à disciplina</span>
+        </div>
+        <input type="file" id="in-pdf" class="hide" accept="application/pdf" multiple onchange="addPdfs(this)">
+        <div style="margin-top:16px" id="lista-pdf">
+          ${PDFS.length? PDFS.slice().reverse().map(p=>`<div class="doc">
+            <div class="ic">PDF</div>
+            <div class="info">
+              <b>${esc(p.nome)}</b>
+              <span>${fmt(p.tamanho)}${p.disciplina?" · "+esc(p.disciplina):""}${p.tema?" · "+esc(p.tema):""}</span>
+              <div class="row" style="gap:7px;margin-top:8px">
+                <select style="width:auto;font-size:12.5px;padding:5px 8px" onchange="linkPdf('${p.id}','disciplina',this.value)">
+                  <option value="">— disciplina —</option>
+                  ${S.disciplinas.map(d=>`<option ${p.disciplina===d.nome?"selected":""}>${esc(d.nome)}</option>`).join("")}
+                </select>
+                <select style="width:auto;font-size:12.5px;padding:5px 8px" onchange="linkPdf('${p.id}','status',this.value)">
+                  ${[["a_ler","A ler"],["lendo","Lendo"],["lido","Lido"],["questoes","Questões feitas"],["revisar","Revisar"]].map(o=>`<option value="${o[0]}" ${p.status===o[0]?"selected":""}>${o[1]}</option>`).join("")}
+                </select>
+                <a class="b" style="text-decoration:none;padding:5px 11px" href="${p.url}" download="${esc(p.nome)}">Baixar</a>
+                <button class="b dg" style="padding:5px 11px" onclick="delPdf('${p.id}')">×</button>
+              </div>
+            </div>
+          </div>`).join("") : '<div class="empty">Nenhum PDF vinculado ainda.</div>'}
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h2>Backup do acervo</h2>
+        <p class="note">O acervo visual vive no navegador. Se você limpar os dados do site, ele se vai. Mantenha os originais também numa pasta na nuvem — o painel é conveniência, não arquivo morto.</p>
+      </div>
+
+      <div class="lb" id="lbx" onclick="this.classList.remove('on')"><button class="x">×</button><img id="lbi" src=""></div>`;
+    }
+
+    function lb(url){ $("#lbi").src = url; $("#lbx").classList.add("on"); }
+
+    async function addImgs(el){
+      const grupo = $("#g-img").value, legenda = $("#l-img").value;
+      for(const f of el.files){
+        const id = "i"+Date.now()+"-"+Math.random().toString(36).slice(2,7);
+        const blob = new Blob([await f.arrayBuffer()], {type:f.type});
+        const rec = {id, nome:f.name, tipo:f.type, blob, legenda: legenda||"", grupo, ts:Date.now()};
+        await dbPut("arquivos", rec);
+        ACERVO.push({...rec, url: URL.createObjectURL(blob)});
+      }
+      el.value=""; $("#l-img").value="";
+      $("#p-acervo").innerHTML = viewAcervo(); bindDrops();
+    }
+    async function delImg(id){ if(!confirm("Remover esta imagem do acervo?")) return; await dbDel("arquivos", id); ACERVO = ACERVO.filter(a=>a.id!==id); $("#p-acervo").innerHTML = viewAcervo(); bindDrops(); }
+    async function addPdfs(el){
+      for(const f of el.files){
+        const id = "p"+Date.now()+"-"+Math.random().toString(36).slice(2,7);
+        const blob = new Blob([await f.arrayBuffer()], {type:"application/pdf"});
+        const rec = {id, nome:f.name, tipo:"application/pdf", blob, tamanho:f.size, disciplina:"", tema:"", status:"a_ler", ts:Date.now()};
+        await dbPut("meta", rec);
+        PDFS.push({...rec, url: URL.createObjectURL(blob)});
+      }
+      el.value="";
+      $("#p-acervo").innerHTML = viewAcervo(); bindDrops();
+    }
+    async function delPdf(id){ if(!confirm("Remover este PDF do acervo?")) return; await dbDel("meta", id); PDFS = PDFS.filter(p=>p.id!==id); $("#p-acervo").innerHTML = viewAcervo(); bindDrops(); }
+    async function linkPdf(id,k,v){ const p = PDFS.find(x=>x.id===id); if(!p) return; p[k]=v; const rec = {id:p.id,nome:p.nome,tipo:"application/pdf",blob:p.blob,tamanho:p.tamanho,disciplina:p.disciplina,tema:p.tema,status:p.status,ts:p.ts}; await dbPut("meta", rec); }
+
+    function bindDrops(){
+      ["drop-img","drop-pdf"].forEach(id=>{
+        const el = $("#"+id); if(!el) return;
+        el.addEventListener("dragover", e=>{ e.preventDefault(); el.classList.add("over"); });
+        el.addEventListener("dragleave", ()=> el.classList.remove("over"));
+        el.addEventListener("drop", async e=>{
+          e.preventDefault(); el.classList.remove("over");
+          const files = [...e.dataTransfer.files];
+          const imgs = files.filter(f=>f.type.startsWith("image/"));
+          const pdfs = files.filter(f=>f.type==="application/pdf");
+          if(imgs.length){
+            const dt = new DataTransfer(); imgs.forEach(f=>dt.items.add(f));
+            const fake = {files:dt.files, value:""};
+            const grupo = $("#g-img").value, legenda = $("#l-img").value;
+            for(const f of dt.files){
+              const id = "i"+Date.now()+"-"+Math.random().toString(36).slice(2,7);
+              const blob = new Blob([await f.arrayBuffer()], {type:f.type});
+              const rec = {id, nome:f.name, tipo:f.type, blob, legenda: legenda||"", grupo, ts:Date.now()};
+              await dbPut("arquivos", rec); ACERVO.push({...rec, url:URL.createObjectURL(blob)});
+            }
+          }
+          if(pdfs.length){
+            for(const f of pdfs){
+              const id = "p"+Date.now()+"-"+Math.random().toString(36).slice(2,7);
+              const blob = new Blob([await f.arrayBuffer()], {type:"application/pdf"});
+              const rec = {id, nome:f.name, tipo:"application/pdf", blob, tamanho:f.size, disciplina:"", tema:"", status:"a_ler", ts:Date.now()};
+              await dbPut("meta", rec); PDFS.push({...rec, url:URL.createObjectURL(blob)});
+            }
+          }
+          $("#p-acervo").innerHTML = viewAcervo(); bindDrops();
+        });
+      });
+    }
+    async function carregaAcervo(){
+      const arqs = await dbAll("arquivos");
+      ACERVO = arqs.map(r=>({...r, url:URL.createObjectURL(r.blob)}));
+      const mts = await dbAll("meta");
+      PDFS = mts.map(r=>({...r, url:URL.createObjectURL(r.blob)}));
+    }
+
+    /* ===== RENDER / TABS ===== */
+    const VIEWS = { "p-tjsp":viewTJSP, "p-log":viewLog, "p-disc":viewDisc, "p-lastro":viewLastro, "p-acervo":viewAcervo, "p-pos":viewPos, "p-dados":viewDados };
+    function render(){
+      $("#app").innerHTML = Object.keys(VIEWS).map(id=>`<div class="pane ${id==="p-tjsp"?"on":""}" id="${id}">${VIEWS[id]()}</div>`).join("");
+      fillTemas();
+    }
+    document.addEventListener("click", e=>{
+      const t = e.target.closest(".tab"); if(!t) return;
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+      document.querySelectorAll(".pane").forEach(x=>x.classList.remove("on"));
+      t.classList.add("on");
+      const p = $("#"+t.dataset.p);
+      p.classList.add("on");
+      p.innerHTML = VIEWS[t.dataset.p]();
+      if(t.dataset.p==="p-log") fillTemas();
+      if(t.dataset.p==="p-acervo") bindDrops();
+    });
+    document.addEventListener("change", e=>{ if(e.target.id==="f-disc") fillTemas(); });
+    document.addEventListener("keydown", e=>{ if(e.key==="Escape") document.body.classList.remove("nav-open"); });
+    render();
+    carregaAcervo().then(()=>{ /* acervo pronto */ });
+    </script>
+    </body>
+    </html>
+    
